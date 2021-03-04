@@ -1,6 +1,6 @@
 module Pronto
   module ProntoSimplecov
-    class Runner < Runner
+    class Simplecov < Runner
       def run
         return [] unless @patches
         return [] if coverage.empty?
@@ -11,9 +11,13 @@ module Pronto
       def process(patch)
         file_coverage = coverage[patch.new_file_full_path.to_s]
         return unless file_coverage
-        patch.added_lines
+        messages = patch.added_lines
              .select { |line| file_coverage.line(line.new_lineno)&.missed? }
              .map { |line| message(line) }
+        messages.group_by { |m| m.path }.map do |path, path_messages|
+          message = "No test coverage on lines: #{path_messages.map(&:line).join(',')}"
+          Message.new(path, path_messages.first.line, :warn, message, nil, self.class)
+        end
       end
 
       def message(line)
