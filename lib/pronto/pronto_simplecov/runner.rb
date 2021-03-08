@@ -16,7 +16,7 @@ module Pronto
              .map { |line| message(line) }
         messages.group_by { |m| m.path }.map do |path, path_messages|
           message = "No test coverage on lines: #{path_messages.map(&:line).join(',')}"
-          Message.new(path, path_messages.first.line, :warn, message, nil, self.class)
+          Message.new(path, path_messages.first.line, :warning, message, nil, self.class)
         end
       end
 
