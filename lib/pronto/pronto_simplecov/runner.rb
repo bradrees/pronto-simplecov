@@ -14,8 +14,9 @@ module Pronto
         messages = patch.added_lines
              .select { |line| file_coverage.line(line.new_lineno)&.missed? }
              .map { |line| message(line) }
+        percentage = '%.2f%' % (100 - (messages.length * 100 / patch.added_lines.length.to_f)) 
         messages.group_by { |m| m.path }.map do |path, path_messages|
-          message = "No test coverage on lines: #{path_messages.map { |m| m.line.new_lineno }.join(',')}"
+          message = "No test coverage on lines: #{path_messages.map { |m| m.line.new_lineno }.join(', ')} (added lines coverage #{percentage})"
           Message.new(path, path_messages.first.line, :warning, message, nil, self.class)
         end
       end
